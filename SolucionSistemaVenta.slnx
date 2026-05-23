@@ -1,0 +1,21 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="SistemaVenta.AplicacionWeb/SistemaVenta.AplicacionWeb.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="SistemaVenta.BLL/SistemaVenta.BLL.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="SistemaVenta.DAL/SistemaVenta.DAL.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="SistemaVenta.Entity/SistemaVenta.Entity.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="SistemaVenta.IOC/SistemaVenta.IOC.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
