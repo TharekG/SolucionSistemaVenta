@@ -1,6 +1,19 @@
-﻿
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
+    // Cargar catálogo de Régimen Fiscal
+    fetch("/Negocio/ListaRegimenFiscal")
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(responseJson => {
+            if (responseJson.length > 0) {
+                responseJson.forEach((item) => {
+                    $("#cboRegimenFiscal").append(
+                        $("<option>").val(item.idRegimenFiscal).text(`${item.cRegimenFiscal} - ${item.descripcion}`)
+                    );
+                });
+            }
+        });
+
+    // Cargar datos del negocio
     $(".card-body").LoadingOverlay("show");
 
     fetch("/Negocio/Obtener")
@@ -9,58 +22,54 @@ $(document).ready(function () {
             return response.ok ? response.json() : Promise.reject(response);
         })
         .then(responseJson => {
-
-            console.log(responseJson);
-
             if (responseJson.estado) {
                 const d = responseJson.objeto;
 
-                $("#txtNumeroDocumento").val(d.numeroDocumento);
+                $("#txtRfc").val(d.rfc);
                 $("#txtRazonSocial").val(d.nombre);
                 $("#txtCorreo").val(d.correo);
                 $("#txtDireccion").val(d.direccion);
                 $("#txTelefono").val(d.telefono);
-                $("#txtImpuesto").val(d.porcentajeImpuesto);
+                $("#txtCodigoPostal").val(d.codigopostal);
                 $("#txtSimboloMoneda").val(d.simboloMoneda);
                 $("#imgLogo").attr("src", d.urlLogo);
 
+                if (d.idRegimenFiscal) {
+                    $("#cboRegimenFiscal").val(d.idRegimenFiscal);
+                }
             } else {
-                swal("Lo sentimos", responseJson.mensaje, "error")
-
+                swal("Lo sentimos", responseJson.mensaje, "error");
             }
-        })
-})
+        });
+});
 
 $("#btnGuardarCambios").click(function () {
 
     const inputs = $("input.input-validar").serializeArray();
-    const inputs_sin_valor = inputs.filter((item) => item.value.trim() == "")
+    const inputs_sin_valor = inputs.filter((item) => item.value.trim() == "");
 
     if (inputs_sin_valor.length > 0) {
-        const mensaje = `Debe completar el campo:  "${inputs_sin_valor[0].name}"`;
-        toastr.warning("", mensaje)
-        $(`input[name="${inputs_sin_valor[0].name}"]`).focus()
+        toastr.warning("", `Debe completar el campo: "${inputs_sin_valor[0].name}"`);
+        $(`input[name="${inputs_sin_valor[0].name}"]`).focus();
         return;
     }
 
     const modelo = {
-
-        numeroDocumento : $("#txtNumeroDocumento").val(),
+        rfc: $("#txtRfc").val(),
         nombre: $("#txtRazonSocial").val(),
         correo: $("#txtCorreo").val(),
         direccion: $("#txtDireccion").val(),
         telefono: $("#txTelefono").val(),
-        porcentajeImpuesto: $("#txtImpuesto").val(),
-        simboloMoneda: $("#txtSimboloMoneda").val()
+        codigopostal: $("#txtCodigoPostal").val(),
+        simboloMoneda: $("#txtSimboloMoneda").val(),
+        idRegimenFiscal: parseInt($("#cboRegimenFiscal").val()) || null,
+        porcentajeImpuesto: "0"
+    };
 
-    }
-
-    const inputLogo = document.getElementById("txtLogo")
-
-    const formData = new FormData()
-
-    formData.append("logo", inputLogo.files[0])
-    formData.append("modelo", JSON.stringify(modelo))
+    const inputLogo = document.getElementById("txtLogo");
+    const formData = new FormData();
+    formData.append("logo", inputLogo.files[0]);
+    formData.append("modelo", JSON.stringify(modelo));
 
     $(".card-body").LoadingOverlay("show");
 
@@ -73,17 +82,11 @@ $("#btnGuardarCambios").click(function () {
             return response.ok ? response.json() : Promise.reject(response);
         })
         .then(responseJson => {
-
-
             if (responseJson.estado) {
-                const d = responseJson.objeto;
-
-                $("#ImgLogo").attr("src", d.urlLogo)
-
+                swal("¡Listo!", "Los cambios del negocio fueron guardados.", "success");
+                $("#imgLogo").attr("src", responseJson.objeto.urlLogo);
             } else {
-                swal("Lo sentimos", responseJson.mensaje, "error")
-
+                swal("Lo sentimos", responseJson.mensaje, "error");
             }
-        })
-
-})
+        });
+});

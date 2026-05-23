@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using SistemaVenta.BLL.Interfaces;
 using SistemaVenta.DAL.Interfaces;
 using SistemaVenta.Entity;
@@ -17,7 +16,6 @@ namespace SistemaVenta.BLL.Implementacion
         {
             _repositorio = repositorio;
             _firebaseService = firebaseService;
-
         }
 
         public async Task<Negocio> Obtener()
@@ -26,7 +24,6 @@ namespace SistemaVenta.BLL.Implementacion
             {
                 Negocio negocio_encontrado = await _repositorio.Obtener(n => n.IdNegocio == 1);
                 return negocio_encontrado;
-
             }
             catch
             {
@@ -39,7 +36,7 @@ namespace SistemaVenta.BLL.Implementacion
             try
             {
                 Negocio negocio_encontrado = await _repositorio.Obtener(n => n.IdNegocio == 1);
-                
+
                 negocio_encontrado.NumeroDocumento = entidad.NumeroDocumento;
                 negocio_encontrado.Nombre = entidad.Nombre;
                 negocio_encontrado.Correo = entidad.Correo;
@@ -48,18 +45,22 @@ namespace SistemaVenta.BLL.Implementacion
                 negocio_encontrado.PorcentajeImpuesto = entidad.PorcentajeImpuesto;
                 negocio_encontrado.SimboloMoneda = entidad.SimboloMoneda;
 
+                // ── Campos nuevos ──────────────────────────────────────────
+                negocio_encontrado.Rfc = entidad.Rfc;
+                negocio_encontrado.Codigopostal = entidad.Codigopostal;
+                negocio_encontrado.IdRegimenFiscal = entidad.IdRegimenFiscal;
+                // ──────────────────────────────────────────────────────────
+
                 negocio_encontrado.NombreLogo = negocio_encontrado.NombreLogo == "" ? NombreLogo : negocio_encontrado.NombreLogo;
 
-                if(Logo != null)
+                if (Logo != null)
                 {
                     string urlLogo = await _firebaseService.SubirStorage(Logo, "carpeta_logo", negocio_encontrado.NombreLogo);
                     negocio_encontrado.UrlLogo = urlLogo;
-
                 }
 
                 await _repositorio.Editar(negocio_encontrado);
                 return negocio_encontrado;
-
             }
             catch
             {
@@ -68,3 +69,4 @@ namespace SistemaVenta.BLL.Implementacion
         }
     }
 }
+

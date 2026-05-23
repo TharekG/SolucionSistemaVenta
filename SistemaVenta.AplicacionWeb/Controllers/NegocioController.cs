@@ -5,21 +5,24 @@ using Newtonsoft.Json;
 using SistemaVenta.AplicacionWeb.Models.ViewModels;
 using SistemaVenta.AplicacionWeb.Utilidades.Response;
 using SistemaVenta.BLL.Interfaces;
+using SistemaVenta.DAL.DBContext;
 using SistemaVenta.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
-
     [Authorize]
     public class NegocioController : Controller
     {
         private readonly IMapper _mapper;
         private readonly INegocioService _negocioService;
+        private readonly DbventaContext _dbContext;
 
-        public NegocioController(IMapper mapper, INegocioService negocioService)
+        public NegocioController(IMapper mapper, INegocioService negocioService, DbventaContext dbContext)
         {
             _mapper = mapper;
             _negocioService = negocioService;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
@@ -28,32 +31,42 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ListaRegimenFiscal()
+        {
+            var lista = await _dbContext.CRegimenFiscalSat
+                .Where(r => r.EsActivo == true)
+                .Select(r => new {
+                    r.IdRegimenFiscal,
+                    r.CRegimenFiscal,
+                    r.Descripcion
+                })
+                .ToListAsync();
+
+            return StatusCode(StatusCodes.Status200OK, lista);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Obtener()
         {
             GenericResponse<VMNegocio> gResponse = new GenericResponse<VMNegocio>();
-
             try
             {
                 VMNegocio vmNegocio = _mapper.Map<VMNegocio>(await _negocioService.Obtener());
-
                 gResponse.Estado = true;
                 gResponse.Objeto = vmNegocio;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 gResponse.Estado = false;
                 gResponse.Mensaje = ex.Message;
             }
-
             return StatusCode(StatusCodes.Status200OK, gResponse);
-
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarCambios([FromForm]IFormFile logo, [FromForm]string modelo)
+        public async Task<IActionResult> GuardarCambios([FromForm] IFormFile logo, [FromForm] string modelo)
         {
             GenericResponse<VMNegocio> gResponse = new GenericResponse<VMNegocio>();
-
             try
             {
                 VMNegocio vmNegocio = JsonConvert.DeserializeObject<VMNegocio>(modelo);
@@ -61,7 +74,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                 string nombreLogo = "";
                 Stream logoStream = null;
 
-                if(logo != null)
+                if (logo != null)
                 {
                     string nombre_en_codigo = Guid.NewGuid().ToString("N");
                     string extension = Path.GetExtension(logo.FileName);
@@ -69,8 +82,8 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                     logoStream = logo.OpenReadStream();
                 }
 
-                Negocio negocio_editado = await _negocioService.GuardarCambios(_mapper.Map<Negocio>(vmNegocio), 
-                    logoStream, nombreLogo);
+                Negocio negocio_editado = await _negocioService.GuardarCambios(
+                    _mapper.Map<Negocio>(vmNegocio), logoStream, nombreLogo);
 
                 vmNegocio = _mapper.Map<VMNegocio>(negocio_editado);
 
@@ -82,11 +95,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                 gResponse.Estado = false;
                 gResponse.Mensaje = ex.Message;
             }
-
             return StatusCode(StatusCodes.Status200OK, gResponse);
-
         }
-
-
     }
 }

@@ -20,5 +20,10 @@
 
         public string? SimboloMoneda { get; set; }
 
+        public string? Rfc { get; set; }
+
+        public string? Codigopostal { get; set; }
+
+        public int? IdRegimenFiscal { get; set; }
     }
 }
