@@ -228,7 +228,21 @@ namespace SistemaVenta.AplicacionWeb.Utilidades.Automapper
 
             #endregion
 
+            #region Cliente
 
+            CreateMap<Cliente, VMCliente>()
+                    .ForMember(destino => destino.EsActivo,
+                        opt => opt.MapFrom(origen => origen.EsActivo == true ? 1 : 0))
+                    .ForMember(destino => destino.DescripcionRegimenFiscal,
+                        opt => opt.MapFrom(origen => origen.IdRegimenFiscalNavigation != null
+                            ? origen.IdRegimenFiscalNavigation.Descripcion
+                            : ""));
+
+            CreateMap<VMCliente, Cliente>()
+                .ForMember(destino => destino.EsActivo,
+                    opt => opt.MapFrom(origen => origen.EsActivo == 1 ? true : false));
+
+            #endregion
 
 
         }

@@ -24,4 +24,12 @@ public partial class Negocio
     public decimal? PorcentajeImpuesto { get; set; }
 
     public string? SimboloMoneda { get; set; }
+
+    public string? Rfc { get; set; }
+
+    public string? Codigopostal { get; set; }
+
+    public int? IdRegimenFiscal { get; set; }
+
+    public virtual CRegimenFiscalSat? IdRegimenFiscalNavigation { get; set; }
 }

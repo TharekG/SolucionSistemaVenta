@@ -23,5 +23,22 @@ public partial class DetalleVenta
 
     public decimal? Total { get; set; }
 
+    // Campos de desglose por producto
+    public decimal? Preciodeventa { get; set; }
+
+    public decimal? Subtotalantesdescuento { get; set; }
+
+    public decimal? Descuentoenporcentaje { get; set; }
+
+    public decimal? Descuentoendinero { get; set; }
+
+    public decimal? Subtotalcondescuento { get; set; }
+
+    public decimal? Impuestoenporcentaje { get; set; }
+
+    public decimal? Impuestoendinero { get; set; }
+
+    public decimal? Totalporproducto { get; set; }
+
     public virtual Venta? IdVentaNavigation { get; set; }
 }
