@@ -85,25 +85,8 @@ public partial class CClaveUnidadSat
 public partial class CClaveProdServSat
 {
     public int IdClaveProdServ { get; set; }
-
     public string? CClaveProdServ { get; set; }
-
     public string? Descripcion { get; set; }
-
-    public string? IncluirIvaTrasladado { get; set; }
-
-    public string? IncluirIepsTrasladado { get; set; }
-
-    public string? ComplementoQueDebeIncluir { get; set; }
-
-    public DateTime? FechaInicioVigencia { get; set; }
-
-    public DateTime? FechaFinVigencia { get; set; }
-
-    public string? EstimuloFranjaFronteriza { get; set; }
-
-    public string? PalabrasSimilares { get; set; }
-
     public bool? EsActivo { get; set; }
 
     public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();

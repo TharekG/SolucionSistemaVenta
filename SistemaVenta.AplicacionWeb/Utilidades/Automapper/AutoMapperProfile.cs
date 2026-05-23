@@ -69,32 +69,32 @@ namespace SistemaVenta.AplicacionWeb.Utilidades.Automapper
             #region Producto
 
             CreateMap<Producto, VMProducto>()
-                .ForMember(destino =>
-                destino.EsActivo,
-                opt => opt.MapFrom(origen => origen.EsActivo == true ? 1 : 0)
-                )
-                .ForMember(destino =>
-                destino.NombreCategoria,
-                opt => opt.MapFrom(origen => origen.IdCategoriaNavigation.Descripcion)
-                )
-                .ForMember(destino =>
-                destino.Precio,
-                opt => opt.MapFrom(origen => Convert.ToString(origen.Precio.Value, new CultureInfo("es-PE")))
-                );
+                .ForMember(dest => dest.DescripcionCategoria, opt => opt.MapFrom(src =>
+                    src.IdCategoriaNavigation != null ? src.IdCategoriaNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionMarca, opt => opt.MapFrom(src =>
+                    src.IdMarcaNavigation != null ? src.IdMarcaNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionMedidaLocal, opt => opt.MapFrom(src =>
+                    src.IdMedidaLocalNavigation != null ? src.IdMedidaLocalNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionClaveUnidad, opt => opt.MapFrom(src =>
+                    src.IdClaveUnidadNavigation != null ? src.IdClaveUnidadNavigation.Nombre : null))
+                .ForMember(dest => dest.DescripcionClaveProdServ, opt => opt.MapFrom(src =>
+                    src.IdClaveProdServNavigation != null ? src.IdClaveProdServNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionObjetoImpuesto, opt => opt.MapFrom(src =>
+                    src.IdObjetoImpuestoNavigation != null ? src.IdObjetoImpuestoNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionImpuesto, opt => opt.MapFrom(src =>
+                    src.IdImpuestoNavigation != null ? src.IdImpuestoNavigation.Descripcion : null))
+                .ForMember(dest => dest.DescripcionTipoFactor, opt => opt.MapFrom(src =>
+                    src.IdTipoFactorNavigation != null ? src.IdTipoFactorNavigation.CTipoFactor : null));
 
             CreateMap<VMProducto, Producto>()
-               .ForMember(destino =>
-               destino.EsActivo,
-               opt => opt.MapFrom(origen => origen.EsActivo == 1 ? true : false)
-               )
-               .ForMember(destino =>
-               destino.IdCategoriaNavigation,
-               opt => opt.Ignore()
-               )
-               .ForMember(destino =>
-               destino.Precio,
-               opt => opt.MapFrom(origen => Convert.ToDecimal(origen.Precio, new CultureInfo("es-PE")))
-               );
+                .ForMember(dest => dest.IdCategoriaNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdMarcaNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdMedidaLocalNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdClaveUnidadNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdClaveProdServNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdObjetoImpuestoNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdImpuestoNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdTipoFactorNavigation, opt => opt.Ignore());
 
             #endregion
 

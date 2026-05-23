@@ -1,19 +1,15 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section Estilos{
-    <!-- ============================================================
-    =ESTILOS PARA ESTA PAGINA
-    ===============================================================-->
+@section Estilos {
     <link rel="stylesheet" href="~/vendor/datatables/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="~/vendor/datatables/extensiones/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="~/vendor/datatables/extensiones/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
 }
 
-<!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3 bg-second-primary">
         <h6 class="m-0 font-weight-bold text-white">Lista de Productos</h6>
@@ -31,91 +27,157 @@
                     <thead>
                         <tr>
                             <th>Id</th>
+                            <th>NombreImagen</th>
+                            <th>UrlImagen</th>
                             <th>Imagen</th>
                             <th>Codigo Barra</th>
                             <th>Marca</th>
                             <th>Descripcion</th>
                             <th>Categoria</th>
                             <th>Stock</th>
-                            <th>Precio</th>
+                            <th>Precio Venta</th>
+                            <th>Descuento</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-<!--  Modal-->
+<!-- Modal -->
 <div class="modal fade" id="modalData" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h6>Detalle Producto</h6>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                    <span aria-hidden="true">x</span>
                 </button>
             </div>
             <div class="modal-body">
                 <form>
                     <input type="hidden" value="0" id="txtId">
+                    <input type="hidden" id="txtNombreImagen">
+
                     <div class="row">
                         <div class="col-sm-8">
+
                             <div class="form-row">
                                 <div class="form-group col-sm-6">
-                                    <label for="txtCodigoBarra">Codigo Barra</label>
+                                    <label>Codigo Barra</label>
                                     <input type="text" class="form-control form-control-sm input-validar" id="txtCodigoBarra" name="Codigo Barra">
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <label for="txtMarca">Marca</label>
-                                    <input type="text" class="form-control form-control-sm input-validar" id="txtMarca" name="Marca">
+                                    <label>Marca</label>
+                                    <select class="form-control form-control-sm" id="cboMarca"></select>
                                 </div>
                             </div>
+
                             <div class="form-row">
-                                <div class="form-group col-sm-12">
-                                    <label for="txtDescripcion">Descripcion</label>
+                                <div class="form-group col-sm-4">
+                                    <label>Modelo</label>
+                                    <input type="text" class="form-control form-control-sm" id="txtModelo">
+                                </div>
+                                <div class="form-group col-sm-8">
+                                    <label>Descripcion</label>
                                     <input type="text" class="form-control form-control-sm input-validar" id="txtDescripcion" name="Descripcion">
                                 </div>
                             </div>
+
                             <div class="form-row">
-                                <div class="form-group col-sm-6">
-                                    <label for="cboCategoria">Categoria</label>
-                                    <select class="form-control form-control-sm" id="cboCategoria">
-                                    </select>
+                                <div class="form-group col-sm-5">
+                                    <label>Categoria</label>
+                                    <select class="form-control form-control-sm" id="cboCategoria"></select>
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="txtStock">Stock</label>
-                                    <input type="text" class="form-control form-control-sm input-validar" id="txtStock" name="Stock">
+                                <div class="form-group col-sm-3">
+                                    <label>Stock</label>
+                                    <input type="number" class="form-control form-control-sm input-validar" id="txtStock" name="Stock" min="0">
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-sm-6">
-                                    <label for="txtPrecio">Precio</label>
-                                    <input type="text" class="form-control form-control-sm input-validar" id="txtPrecio" name="Precio">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="cboEstado">Estado</label>
+                                <div class="form-group col-sm-4">
+                                    <label>Estado</label>
                                     <select class="form-control form-control-sm" id="cboEstado">
                                         <option value="1">Activo</option>
                                         <option value="0">No Activo</option>
                                     </select>
                                 </div>
                             </div>
+
                             <div class="form-row">
-                                <div class="form-group col-sm-6">
-                                    <label for="txtImagen">Imagen</label>
-                                    <input class="form-control-file" type="file" id="txtImagen" />
+                                <div class="form-group col-sm-3">
+                                    <label>Precio Compra</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtPrecioCompra" step="0.01" min="0">
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Precio Venta</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtPrecioVenta" step="0.01" min="0">
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Precio</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtPrecio" step="0.01" min="0">
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Descuento (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtDescuentoPct" value="0" min="0" max="100" step="0.01">
                                 </div>
                             </div>
+
+                            <hr class="my-2">
+                            <p class="text-primary font-weight-bold mb-2" style="font-size:0.85rem;">Datos SAT</p>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-6">
+                                    <label>Medida Local (Empresa)</label>
+                                    <select class="form-control form-control-sm" id="cboMedidaLocal"></select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Unidad de Medida SAT</label>
+                                    <select class="form-control form-control-sm" id="cboClaveUnidad"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-12">
+                                    <label>Clave Producto/Servicio SAT</label>
+                                    <select class="form-control form-control-sm" id="cboClaveProdServ" style="width:100%"></select>
+                                    <small class="text-muted">Escriba al menos 2 caracteres para buscar</small>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-3">
+                                    <label>Objeto Impuesto</label>
+                                    <select class="form-control form-control-sm" id="cboObjetoImpuesto"></select>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Impuesto</label>
+                                    <select class="form-control form-control-sm" id="cboImpuesto"></select>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Tipo Factor</label>
+                                    <select class="form-control form-control-sm" id="cboTipoFactor"></select>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>% Impuesto</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtImpuestoPct" value="0" min="0" max="100" step="0.01">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-6">
+                                    <label>Imagen</label>
+                                    <input class="form-control-file" type="file" id="txtImagen" accept="image/*" />
+                                </div>
+                            </div>
+
                         </div>
+
                         <div class="col-sm-4">
                             <img id="imgProducto" style="max-width:200px;" src="" class="rounded mx-auto d-block" alt="...">
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -127,24 +189,14 @@
     </div>
 </div>
 
-
-@section Scripts{
-    <!-- ============================================================
-    =SCRIPTS PARA ESTA PAGINA
-    ===============================================================-->
+@section Scripts {
     <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
     <script src="~/vendor/datatables/extensiones/js/dataTables.responsive.min.js"></script>
-
     <script src="~/vendor/datatables/extensiones/js/dataTables.buttons.min.js"></script>
     <script src="~/vendor/datatables/extensiones/js/jszip.min.js"></script>
     <script src="~/vendor/datatables/extensiones/js/buttons.html5.min.js"></script>
     <script src="~/vendor/datatables/extensiones/js/buttons.print.min.js"></script>
-
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/vistas/Producto_Index.js"></script>
-
-    <!-- SOLO ES DE EJEMPLO - IGNORAR -->
-    @*<script src="~/js/vistas/datatables-demo.js"></script>*@
 }
