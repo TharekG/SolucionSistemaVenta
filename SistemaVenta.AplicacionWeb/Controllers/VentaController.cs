@@ -91,7 +91,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
             catch (Exception ex)
             {
                 gResponse.Estado = false;
-                gResponse.Mensaje = ex.Message;
+                gResponse.Mensaje = ex.InnerException?.Message ?? ex.Message;
             }
 
             return StatusCode(StatusCodes.Status200OK, gResponse);

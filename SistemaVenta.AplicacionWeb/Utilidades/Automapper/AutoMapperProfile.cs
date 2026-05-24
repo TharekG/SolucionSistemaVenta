@@ -108,6 +108,14 @@ namespace SistemaVenta.AplicacionWeb.Utilidades.Automapper
 
             CreateMap<Venta, VMVenta>()
                 .ForMember(destino =>
+                destino.IdCliente,
+                opt => opt.MapFrom(src => src.IdCliente)
+                )
+                .ForMember(destino => 
+                destino.Uuid,
+                opt => opt.MapFrom(src => src.Uuid)
+                )
+                .ForMember(destino =>
                 destino.TipoDocumentoVenta,
                 opt => opt.MapFrom(origen => origen.IdTipoDocumentoVentaNavigation.Descripcion)
                 )

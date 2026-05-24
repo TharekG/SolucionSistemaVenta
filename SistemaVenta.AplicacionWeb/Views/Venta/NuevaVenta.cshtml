@@ -1,26 +1,24 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "NuevaVenta";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>NuevaVenta</h1>
 
-@section Estilos{
-    <!-- ============================================================
-    =ESTILOS PARA ESTA PAGINA
-    ===============================================================-->
+@section Estilos {
     <link href="~/vendor/select2/select2.min.css" rel="stylesheet">
 }
 
 <style>
-    .select2{
+    .select2 {
         width: 100% !important;
     }
 </style>
 
 <div class="row">
     <div class="col-sm-8">
+
+        <!-- ── Cliente ─────────────────────────────────────────────── -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="card shadow mb-4">
@@ -28,18 +26,33 @@
                         <h6 class="m-0 font-weight-bold text-white">Cliente</h6>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group col-sm-6">
-                                <input type="text" class="form-control form-control-sm" id="txtDocumentoCliente" placeholder="numero documento">
+                        <input type="hidden" id="txtIdCliente" value="0">
+                        <div class="form-row align-items-end">
+                            <div class="form-group col-sm-4">
+                                <label>RFC</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control form-control-sm" id="txtRfcCliente"
+                                           placeholder="XAXX010101000" maxlength="13"
+                                           style="text-transform:uppercase">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-sm" type="button" id="btnBuscarCliente">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group col-sm-6">
-                                <input type="text" class="form-control form-control-sm" id="txtNombreCliente" placeholder="nombre completo">
+                            <div class="form-group col-sm-8">
+                                <label>Nombre Cliente</label>
+                                <input type="text" class="form-control form-control-sm" id="txtNombreCliente"
+                                       placeholder="Nombre completo" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- ── Productos ───────────────────────────────────────────── -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="card shadow mb-4">
@@ -61,13 +74,13 @@
                                         <tr>
                                             <th></th>
                                             <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Precio</th>
-                                            <th>Total</th>
+                                            <th>Cant.</th>
+                                            <th>Precio Unit.</th>
+                                            <th>Descuento</th>
+                                            <th>Subtotal</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -75,10 +88,10 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <div class="col-sm-4">
 
+    <!-- ── Detalle / Totales ──────────────────────────────────────── -->
+    <div class="col-sm-4">
         <div class="row">
             <div class="col-sm-12">
                 <div class="card shadow mb-4">
@@ -90,33 +103,36 @@
                             <div class="input-group-prepend">
                                 <label class="input-group-text" for="cboTipoDocumentoVenta">Tipo</label>
                             </div>
-                            <select class="custom-select" id="cboTipoDocumentoVenta">
-                            </select>
+                            <select class="custom-select" id="cboTipoDocumentoVenta"></select>
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="inputGroupSubTotal">Sub Total</span>
                             </div>
-                            <input type="text" class="form-control text-right" aria-label="Small" aria-describedby="inputGroupSubTotal" id="txtSubTotal" disabled>
+                            <input type="text" class="form-control text-right" id="txtSubTotal" disabled>
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="inputGroupIGV">IGV(18%)</span>
+                                <span class="input-group-text">Descuento</span>
                             </div>
-                            <input type="text" class="form-control text-right" aria-label="Small" aria-describedby="inputGroupIGV" id="txtIGV" disabled>
+                            <input type="text" class="form-control text-right" id="txtDescuentoTotal" disabled>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroupIGV">IVA</span>
+                            </div>
+                            <input type="text" class="form-control text-right" id="txtIGV" disabled>
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="inputGroupTotal">Total</span>
                             </div>
-                            <input type="text" class="form-control text-right" aria-label="Small" aria-describedby="inputGroupTotal" id="txtTotal" disabled>
+                            <input type="text" class="form-control text-right" id="txtTotal" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
         <div class="row">
             <div class="col-sm-12">
                 <div class="card shadow">
@@ -131,12 +147,8 @@
     </div>
 </div>
 
-@section Scripts{
-    <!-- ============================================================
-    =SCRIPTS PARA ESTA PAGINA
-    ===============================================================-->
+@section Scripts {
     <script src="~/vendor/select2/select2.min.js"></script>
     <script src="~/vendor/select2/es.min.js"></script>
-
     <script src="~/js/vistas/Nueva_Venta.js"></script>
 }

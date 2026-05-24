@@ -29,8 +29,11 @@ namespace SistemaVenta.BLL.Implementacion
                 p => p.EsActivo == true &&
                 p.Stock > 0 &&
                 string.Concat(p.CodigoBarra, p.Marca, p.Descripcion).Contains(busqueda)
-                );
-            return query.Include(c => c.IdCategoriaNavigation).ToList();
+            );
+            return query
+                .Include(c => c.IdCategoriaNavigation)
+                .Include(c => c.IdMarcaNavigation)
+                .ToList();
         }
 
         public async Task<Venta> Registrar(Venta entidad)
