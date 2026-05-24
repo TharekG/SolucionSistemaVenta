@@ -19,6 +19,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.InyectarDependencia(builder.Configuration);
 
+builder.Services.AddScoped<SistemaVenta.AplicacionWeb.Utilidades.TimbradoService>();
+
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var context = new CustomAssemblyLoadContext();

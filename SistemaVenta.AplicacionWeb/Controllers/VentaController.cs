@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVenta.AplicacionWeb.Models.ViewModels;
+using SistemaVenta.AplicacionWeb.Utilidades;
 using SistemaVenta.AplicacionWeb.Utilidades.Response;
 using SistemaVenta.BLL.Interfaces;
 using SistemaVenta.DAL.DBContext;
@@ -23,18 +24,21 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         private readonly IMapper _mapper;
         private readonly IConverter _converter;
         private readonly DbventaContext _dbContext;
+        private readonly TimbradoService _timbradoService;
 
         public VentaController(ITipoDocumentoVentaService tipoDocumentoVentaServicio,
             IVentaService ventaServicio,
             IMapper mapper,
             IConverter converter,
-            DbventaContext dbContext)
+            DbventaContext dbContext,
+            TimbradoService timbradoService) 
         {
             _tipoDocumentoVentaServicio = tipoDocumentoVentaServicio;
             _ventaServicio = ventaServicio;
             _mapper = mapper;
             _converter = converter;
             _dbContext = dbContext;
+            _timbradoService = timbradoService;
         }
 
         public IActionResult NuevaVenta()
@@ -159,6 +163,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
 
         // ── Solicitar Factura ─────────────────────────────────────────────────────
 
+
         [HttpPost]
         public async Task<IActionResult> SolicitarFactura([FromBody] VMSolicitarFactura modelo)
         {
@@ -174,19 +179,24 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                 if (!string.IsNullOrEmpty(venta.Uuid))
                     throw new TaskCanceledException("Esta venta ya fue facturada.");
 
+                // Save CFDI fields to venta
                 venta.IdUsoCFDI = modelo.IdUsoCFDI;
                 venta.IdRegimenFiscal = modelo.IdRegimenFiscal;
                 venta.IdFormaPago = modelo.IdFormaPago;
                 venta.IdMetodoPago = modelo.IdMetodoPago;
                 venta.IdTipoDeComprobante = modelo.IdTipoDeComprobante;
                 venta.CodigoPostal = modelo.CodigoPostal;
-                // UUID simulado — en producción vendría del PAC timbrador
-                venta.Uuid = Guid.NewGuid().ToString();
-                venta.FechaTimbrado = DateTime.Now;
+                await _dbContext.SaveChangesAsync();
 
+                // Call real timbrado service
+                string uuid = await _timbradoService.TimbrarVenta(modelo.IdVenta);
+
+                venta.Uuid = uuid;
+                venta.FechaTimbrado = DateTime.Now;
                 await _dbContext.SaveChangesAsync();
 
                 gResponse.Estado = true;
+                gResponse.Mensaje = uuid;
             }
             catch (Exception ex)
             {
@@ -195,6 +205,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
             }
             return StatusCode(StatusCodes.Status200OK, gResponse);
         }
+
 
 
 
