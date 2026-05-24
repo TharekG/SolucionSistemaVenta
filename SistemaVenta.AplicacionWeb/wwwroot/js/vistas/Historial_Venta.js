@@ -41,6 +41,9 @@ $(document).ready(function () {
         const idTipoDeComprobante = parseInt($("#cboTipoComprobante").val()) || null;
         const codigoPostal = $("#txtCPFactura").val().trim();
 
+        console.log({ idVenta, idUsoCFDI, idRegimenFiscal, idFormaPago, idMetodoPago, idTipoDeComprobante, codigoPostal });
+
+
         if (!idUsoCFDI || !idRegimenFiscal || !idFormaPago || !idMetodoPago || !idTipoDeComprobante || !codigoPostal) {
             toastr.warning("", "Debe completar todos los campos de facturación");
             return;
