@@ -1,34 +1,19 @@
-﻿using SistemaVenta.Entity;
+﻿using SistemaVenta.AplicacionWeb.Models.ViewModels;
 
-namespace SistemaVenta.AplicacionWeb.Models.ViewModels
+public class VMVenta
 {
-    public class VMVenta
-    {
-        public int IdVenta { get; set; }
+    public int IdVenta { get; set; }
+    public string? NumeroVenta { get; set; }
+    public int? IdTipoDocumentoVenta { get; set; }
+    public string? TipoDocumentoVenta { get; set; }
+    public int? IdUsuario { get; set; }
+    public string? Usuario { get; set; }
+    public string? DocumentoCliente { get; set; }
+    public string? NombreCliente { get; set; }
+    public string? SubTotal { get; set; }      
+    public string? ImpuestoTotal { get; set; }   
+    public string? Total { get; set; }          
+    public string? FechaRegistro { get; set; }   
 
-        public string? NumeroVenta { get; set; }
-
-        public int? IdTipoDocumentoVenta { get; set; }
-
-        public string? TipoDocumentoVenta { get; set; }
-
-        public int? IdUsuario { get; set; }
-
-        public string? Usuario { get; set; }
-
-        public string? DocumentoCliente { get; set; }
-
-        public string? NombreCliente { get; set; }
-
-        public decimal? SubTotal { get; set; }
-
-        public decimal? ImpuestoTotal { get; set; }
-
-        public decimal? Total { get; set; }
-
-        public DateTime? FechaRegistro { get; set; }
-
-        public virtual ICollection<VMDetalleVenta> DetalleVenta { get; set; }
-
-    }
+    public virtual ICollection<VMDetalleVenta> DetalleVenta { get; set; }
 }

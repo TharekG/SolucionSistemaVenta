@@ -58,8 +58,8 @@ namespace SistemaVenta.BLL.Implementacion
             if(fechaInicio != "" && fechaFin != "")
             {
 
-                DateTime fech_inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", new CultureInfo("es-PE"));
-                DateTime fech_fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", new CultureInfo("es-PE"));
+                DateTime fech_inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fech_fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
                 return query.Where(v =>
                     v.FechaRegistro.Value.Date >= fech_inicio.Date &&
