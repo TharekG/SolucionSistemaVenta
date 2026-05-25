@@ -41,9 +41,6 @@ $(document).ready(function () {
         const idTipoDeComprobante = parseInt($("#cboTipoComprobante").val()) || null;
         const codigoPostal = $("#txtCPFactura").val().trim();
 
-        console.log({ idVenta, idUsoCFDI, idRegimenFiscal, idFormaPago, idMetodoPago, idTipoDeComprobante, codigoPostal });
-
-
         if (!idUsoCFDI || !idRegimenFiscal || !idFormaPago || !idMetodoPago || !idTipoDeComprobante || !codigoPostal) {
             toastr.warning("", "Debe completar todos los campos de facturación");
             return;
@@ -66,7 +63,6 @@ $(document).ready(function () {
                 if (responseJson.estado) {
                     $("#modalFactura").modal("hide");
                     swal("¡Listo!", "Factura solicitada correctamente.", "success");
-                    // Deshabilitar el botón en la fila correspondiente
                     $(`button.btn-factura[data-idventa="${idVenta}"]`)
                         .prop("disabled", true)
                         .attr("title", "Ya facturado");
@@ -75,6 +71,24 @@ $(document).ready(function () {
                 }
             })
             .catch(() => swal("Error", "No se pudo conectar con el servidor.", "error"));
+    });
+
+    // ── Ver XML ─────────────────────────────────────────────────────────
+    $("#tbventa tbody").on("click", ".btn-xml", function () {
+        const numVenta = $(this).data("numventa");
+        const pre = document.getElementById("xmlContent");
+
+        $("#xmlNumVenta").text(numVenta);
+        pre.textContent = "Cargando...";
+        document.getElementById("btnDescargarZip").href = `/facturas/factura_${numVenta}.zip`;
+        document.getElementById("btnDescargarXml").href = `/facturas/factura_${numVenta}.xml`;
+
+        $("#modalXml").modal("show");
+
+        fetch(`/Venta/VerXmlFactura?idVenta=${$(this).data("id")}`)
+            .then(r => r.ok ? r.text() : Promise.reject(r))
+            .then(text => { pre.textContent = formatXml(text); })
+            .catch(() => { pre.textContent = "XML no disponible para esta venta."; });
     });
 });
 
@@ -120,8 +134,9 @@ $("#btnBuscar").click(function () {
             if (responseJson.length > 0) {
                 responseJson.forEach((venta) => {
 
-                    // Si tiene UUID → ya facturado → botón deshabilitado
                     const yaFacturado = venta.uuid && venta.uuid.trim() !== "";
+
+                    // Botón solicitar factura
                     const btnFactura = $("<button>")
                         .addClass("btn btn-warning btn-sm btn-factura ml-1")
                         .attr("title", yaFacturado ? "Ya facturado" : "Solicitar Factura")
@@ -130,10 +145,28 @@ $("#btnBuscar").click(function () {
                         .data("venta", venta)
                         .append($("<i>").addClass("fas fa-file-invoice"));
 
+                    // Botón ver detalle
                     const btnDetalle = $("<button>")
                         .addClass("btn btn-info btn-sm")
+                        .attr("title", "Ver detalle")
                         .append($("<i>").addClass("fas fa-eye"))
                         .data("venta", venta);
+
+                    // Botón ver XML (solo si ya fue timbrada)
+                    const btnXml = yaFacturado
+                        ? $("<button>")
+                            .addClass("btn btn-secondary btn-sm btn-xml ml-1")
+                            .attr("title", "Ver XML del CFDI")
+                            .attr("data-id", venta.idVenta)
+                            .attr("data-numventa", venta.numeroVenta)
+                            .append($("<i>").addClass("fas fa-code"))
+                        : null;
+
+                    const tdAcciones = $("<td>")
+                        .append(btnDetalle)
+                        .append(btnFactura);
+
+                    if (btnXml) tdAcciones.append(btnXml);
 
                     $("#tbventa tbody").append(
                         $("<tr>").append(
@@ -143,7 +176,7 @@ $("#btnBuscar").click(function () {
                             $("<td>").text(venta.documentoCliente),
                             $("<td>").text(venta.nombreCliente),
                             $("<td>").text(venta.total),
-                            $("<td>").append(btnDetalle).append(btnFactura)
+                            tdAcciones
                         )
                     )
                 })
@@ -239,4 +272,41 @@ function cargarTipoComprobante() {
             sel.empty().append('<option value="">-- Seleccione --</option>');
             data.forEach(x => sel.append(`<option value="${x.idTipoDeComprobante}">${x.cTipoDeComprobante} - ${x.descripcion}</option>`));
         });
+}
+
+// ── Validación PPD → forzar FormaPago 99 ─────────────────────────────────
+$("#cboMetodoPago").change(function () {
+    const texto = $(this).find("option:selected").text();
+    const esPPD = texto.indexOf("PPD") !== -1;
+
+    if (esPPD) {
+        // Buscar y seleccionar el 99
+        let encontrado = false;
+        $("#cboFormaPago option").each(function () {
+            if ($(this).text().indexOf("99") !== -1) {
+                $("#cboFormaPago").val($(this).val());
+                encontrado = true;
+                return false;
+            }
+        });
+        $("#cboFormaPago").prop("disabled", true);
+        if (encontrado) {
+            toastr.info("Forma de pago establecida en 99 - Por definir (requerido por SAT para PPD)", "");
+        }
+    } else {
+        $("#cboFormaPago").prop("disabled", false);
+    }
+});
+
+// ── Formatear XML ─────────────────────────────────────────────────────────
+function formatXml(xml) {
+    let formatted = '', indent = '';
+    xml.replace(/>\s*</g, '><').split(/></).forEach((node, i) => {
+        if (i > 0) formatted += '\n';
+        if (node.match(/^\/\w/)) indent = indent.slice(2);
+        formatted += indent + (i === 0 ? '' : '<') + node + (node.endsWith('>') ? '' : '>');
+        if (!node.match(/\/$/) && node.match(/^<?\w[^/]*[^/]$/) && !node.startsWith('?') && !node.startsWith('!'))
+            indent += '  ';
+    });
+    return formatted;
 }

@@ -36,7 +36,9 @@
                 <input type="text" class="form-control form-control-sm" id="txtNumeroVenta">
             </div>
             <div class="form-group col-sm-3">
-                <button class="btn btn-success btn-block btn-sm" type="button" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
+                <button class="btn btn-success btn-block btn-sm" type="button" id="btnBuscar">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
             </div>
         </div>
         <hr />
@@ -201,9 +203,43 @@
     </div>
 </div>
 
+<!-- ── Modal Ver XML CFDI ──────────────────────────────────────────────── -->
+<div class="modal fade" id="modalXml" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h6 class="modal-title font-weight-bold">
+                    <i class="fas fa-file-code"></i> XML del CFDI Timbrado
+                    <span id="xmlNumVenta" class="ml-2 text-warning"></span>
+                </h6>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <pre id="xmlContent"
+                     style="background:#1e1e1e; color:#d4d4d4; padding:1.5rem;
+                margin:0; font-size:0.78rem; overflow-x:auto;
+                white-space:pre; border:none; min-height:300px;">
+                Cargando...</pre>
+            </div>
+            <div class="modal-footer">
+                <a id="btnDescargarZip" href="#" class="btn btn-success btn-sm" download>
+                    <i class="fas fa-file-archive"></i> Descargar ZIP
+                </a>
+                <a id="btnDescargarXml" href="#" class="btn btn-primary btn-sm" download>
+                    <i class="fas fa-download"></i> Descargar XML
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/vendor/jquery-ui/jquery-ui.js"></script>
     <script src="~/vendor/jquery-ui/idioma/datepicker-es.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/vistas/Historial_Venta.js"></script>
 }
+

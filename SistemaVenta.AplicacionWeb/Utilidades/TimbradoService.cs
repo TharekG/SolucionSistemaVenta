@@ -42,16 +42,47 @@ namespace SistemaVenta.AplicacionWeb.Utilidades
                 .FirstOrDefaultAsync(n => n.IdNegocio == 1)
                 ?? throw new Exception("Negocio no configurado.");
 
-            // 3. Construir XML y timbrar
+            // 3. Verificar que no esté ya timbrada (por UUID en BD o ZIP existente)
+            if (!string.IsNullOrEmpty(venta.Uuid))
+                throw new Exception($"Esta venta ya fue timbrada. UUID: {venta.Uuid}");
+
+            // Usar mismo formato de nombre que al guardar
+            string numVentaGuard = !string.IsNullOrWhiteSpace(venta.NumeroVenta)
+                ? venta.NumeroVenta
+                : idVenta.ToString().PadLeft(6, '0');
+            string zipPath = Path.Combine("wwwroot", "facturas", $"factura_{numVentaGuard}.zip");
+            if (File.Exists(zipPath))
+                throw new Exception("Esta venta ya fue timbrada anteriormente. Para ver el CFDI usa el botón XML en el historial.");
+
+            // 4. Construir XML y timbrar
             string xml = await BuildXml(venta, negocio);
 
             byte[] zipBytes = await CallTimbrarF(xml);
             string uuid = ExtractUuidFromZip(zipBytes);
 
-            // 4. Guardar ZIP (opcional – para descarga futura)
+            // 4. Guardar ZIP y también el XML suelto (para visualización)
             string folder = Path.Combine("wwwroot", "facturas");
+            // Usar NumeroVenta si existe; si no, formatear igual que el sistema (6 dígitos)
+            string numVenta = !string.IsNullOrWhiteSpace(venta.NumeroVenta)
+                ? venta.NumeroVenta
+                : idVenta.ToString().PadLeft(6, '0');
             Directory.CreateDirectory(folder);
-            await File.WriteAllBytesAsync(Path.Combine(folder, $"factura_{idVenta}.zip"), zipBytes);
+            await File.WriteAllBytesAsync(Path.Combine(folder, $"factura_{numVenta}.zip"), zipBytes);
+
+            // Extraer y guardar el XML por separado
+            using (var ms2 = new MemoryStream(zipBytes))
+            using (var zip2 = new System.IO.Compression.ZipArchive(ms2, System.IO.Compression.ZipArchiveMode.Read))
+            {
+                var xmlEntry = zip2.Entries
+                    .FirstOrDefault(e => e.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase));
+                if (xmlEntry != null)
+                {
+                    using var sr = new StreamReader(xmlEntry.Open(), Encoding.UTF8);
+                    string xmlTimbrado = sr.ReadToEnd();
+                    await File.WriteAllTextAsync(
+                        Path.Combine(folder, $"factura_{numVenta}.xml"), xmlTimbrado, Encoding.UTF8);
+                }
+            }
 
             return uuid;
         }
@@ -62,10 +93,14 @@ namespace SistemaVenta.AplicacionWeb.Utilidades
         private async Task<string> BuildXml(Venta venta, Negocio negocio)
         {
             // ── Encabezado ────────────────────────────────────────────────
-            string idLocal = ID_PREFIX + venta.IdVenta.ToString();
+            // idLocal DEBE ser único por timbrado — usamos prefijo+idVenta+sufijo único
+            string idLocal = ID_PREFIX + venta.IdVenta.ToString() + Guid.NewGuid().ToString("N")[..6].ToUpper();
             string folio = venta.NumeroVenta ?? venta.IdVenta.ToString();
-            string formaPago = (venta.IdFormaPagoNavigation?.CFormaPago ?? "01").Trim().PadLeft(2, '0');
-            string metodoPago = venta.IdMetodoPagoNavigation?.CMetodoPago ?? "PUE";
+            string metodoPago = (venta.IdMetodoPagoNavigation?.CMetodoPago ?? "PUE").Trim();
+            // Regla SAT CFDI40105: si MetodoPago=PPD entonces FormaPago DEBE ser "99"
+            string formaPago = metodoPago == "PPD"
+                ? "99"
+                : (venta.IdFormaPagoNavigation?.CFormaPago ?? "01").Trim().PadLeft(2, '0');
             string lugarExp = negocio.Codigopostal ?? venta.CodigoPostal ?? "64000";
 
             // tipoDeComprobante DEBE ser "I", "E", "T", "N" o "P"
