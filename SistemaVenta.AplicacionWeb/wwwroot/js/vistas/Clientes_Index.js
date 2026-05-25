@@ -13,6 +13,17 @@ let tablaData;
 
 $(document).ready(function () {
 
+    // Cargar catálogo Régimen Fiscal
+    fetch("/Negocio/ListaRegimenFiscal")
+        .then(r => r.json())
+        .then(data => {
+            const sel = $("#cboRegimenFiscal");
+            sel.empty().append('<option value="">-- Seleccione --</option>');
+            data.forEach(x => sel.append(
+                `<option value="${x.idRegimenFiscal}">${x.descripcion}</option>`
+            ));
+        });
+
     tablaData = $('#tbdata').DataTable({
         responsive: true,
         "ajax": {
@@ -65,8 +76,8 @@ function mostrarModal(modelo = MODELO_BASE) {
     $("#txtNombreCliente").val(modelo.nombreCliente);
     $("#txtCorreoElectronico").val(modelo.correoElectronico);
     $("#txtRfcCliente").val(modelo.rfcCliente);
-    $("#txtIdCodigoPostal").val(modelo.idCodigoPostal);
-    $("#txtIdRegimenFiscal").val(modelo.idRegimenFiscal);
+    $("#txtDomicilioCP").val(modelo.idCodigoPostal || "");
+    $("#cboRegimenFiscal").val(modelo.idRegimenFiscal);
     $("#cboEstado").val(modelo.esActivo);
     $("#modalData").modal("show");
 }
@@ -91,8 +102,8 @@ $("#btnGuardar").click(function () {
     modelo["nombreCliente"] = $("#txtNombreCliente").val();
     modelo["correoElectronico"] = $("#txtCorreoElectronico").val();
     modelo["rfcCliente"] = $("#txtRfcCliente").val().toUpperCase();
-    modelo["idCodigoPostal"] = parseInt($("#txtIdCodigoPostal").val()) || null;
-    modelo["idRegimenFiscal"] = parseInt($("#txtIdRegimenFiscal").val()) || null;
+    modelo["idCodigoPostal"] = parseInt($("#txtDomicilioCP").val()) || null;
+    modelo["idRegimenFiscal"] = parseInt($("#cboRegimenFiscal").val()) || null;
     modelo["esActivo"] = $("#cboEstado").val();
 
     $("#modalData").find("div.modal-content").LoadingOverlay("show");

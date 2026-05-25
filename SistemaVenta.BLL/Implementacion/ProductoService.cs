@@ -42,6 +42,7 @@ namespace SistemaVenta.BLL.Implementacion
 
             try
             {
+                entidad.Precio = entidad.Precioventa;
                 entidad.NombreImagen = NombreImagen;
 
                 if (imagen != null)
@@ -94,7 +95,7 @@ namespace SistemaVenta.BLL.Implementacion
                 producto_para_editar.Descripcion = entidad.Descripcion;
                 producto_para_editar.IdCategoria = entidad.IdCategoria;
                 producto_para_editar.Stock = entidad.Stock;
-                producto_para_editar.Precio = entidad.Precio;
+                producto_para_editar.Precio = entidad.Precioventa;
                 producto_para_editar.EsActivo = entidad.EsActivo;
 
                 // ── Campos nuevos ──────────────────────────────────────────

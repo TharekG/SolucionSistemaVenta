@@ -62,39 +62,39 @@
                             <div class="form-row">
                                 <div class="form-group col-sm-6">
                                     <label>Nombre</label>
-                                    <input type="text" class="form-control form-control-sm input-validar"
+                                    <input type="text" class="form-control input-validar"
                                            id="txtNombreCliente" name="Nombre" placeholder="Nombre completo">
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label>Correo</label>
-                                    <input type="email" class="form-control form-control-sm input-validar"
+                                    <input type="email" class="form-control input-validar"
                                            id="txtCorreoElectronico" name="Correo" placeholder="correo@ejemplo.com">
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-sm-4">
+                                <div class="form-group col-sm-6">
+                                    <label>Domicilio (C.P.)</label>
+                                    <input type="text" class="form-control input-validar"
+                                           id="txtDomicilioCP" name="Domicilio (C.P.)" placeholder="64000">
+                                </div>
+                                <div class="form-group col-sm-6">
                                     <label>RFC</label>
-                                    <input type="text" class="form-control form-control-sm input-validar"
-                                           id="txtRfcCliente" name="RFC" placeholder="XAXX010101000" maxlength="13">
-                                </div>
-                                <div class="form-group col-sm-4">
-                                    <label>Código Postal</label>
-                                    <input type="number" class="form-control form-control-sm input-validar"
-                                           id="txtIdCodigoPostal" name="Código Postal" placeholder="64000">
-                                </div>
-                                <div class="form-group col-sm-4">
-                                    <label>Régimen Fiscal (id)</label>
-                                    <input type="number" class="form-control form-control-sm input-validar"
-                                           id="txtIdRegimenFiscal" name="Régimen Fiscal" placeholder="Ej: 1">
+                                    <input type="text" class="form-control input-validar"
+                                           id="txtRfcCliente" name="RFC" placeholder="XAXX010101000" maxlength="13"
+                                           style="text-transform:uppercase">
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-sm-4">
+                                <div class="form-group col-sm-6">
                                     <label>Estado</label>
-                                    <select class="form-control form-control-sm" id="cboEstado">
+                                    <select class="form-control" id="cboEstado">
                                         <option value="1">Activo</option>
                                         <option value="0">No Activo</option>
                                     </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Régimen Fiscal</label>
+                                    <select class="form-control" id="cboRegimenFiscal"></select>
                                 </div>
                             </div>
                         </div>

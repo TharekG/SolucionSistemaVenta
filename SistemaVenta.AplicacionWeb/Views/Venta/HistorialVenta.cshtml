@@ -45,15 +45,13 @@
         <div class="row">
             <div class="col-sm-12">
                 <table class="table table-sm table-striped" id="tbventa">
-                    <thead>
+                    <thead class="thead-dark">
                         <tr>
                             <th>Fecha Registro</th>
-                            <th>Numero Venta</th>
-                            <th>Tipo Documento</th>
-                            <th>Documento Cliente</th>
                             <th>Nombre Cliente</th>
+                            <th>Numero Venta</th>
                             <th>Total</th>
-                            <th></th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -150,7 +148,7 @@
 <div class="modal fade" id="modalFactura" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-warning">
+            <div class="modal-header">
                 <h6 class="font-weight-bold">Solicitar Factura</h6>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -194,8 +192,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-warning btn-sm font-weight-bold" type="button" id="btnEnviarFactura">
-                    <i class="fas fa-file-invoice"></i> Solicitar Factura
+                <button class="btn btn-success btn-sm font-weight-bold" type="button" id="btnEnviarFactura">
+                    <i class="fas fa-file-invoice-dollar"></i> Solicitar Factura
                 </button>
                 <button class="btn btn-danger btn-sm" type="button" data-dismiss="modal">Cancelar</button>
             </div>
@@ -242,4 +240,3 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/vistas/Historial_Venta.js"></script>
 }
-

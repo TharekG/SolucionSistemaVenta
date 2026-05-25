@@ -128,9 +128,9 @@ $(document).ready(function () {
         modelo["descripcion"] = $("#txtDescripcion").val();
         modelo["idCategoria"] = parseInt($("#cboCategoria").val()) || null;
         modelo["stock"] = parseInt($("#txtStock").val()) || 0;
-        modelo["precio"] = parseFloat($("#txtPrecio").val()) || null;
-        modelo["preciocompra"] = parseFloat($("#txtPrecioCompra").val()) || null;
         modelo["precioventa"] = parseFloat($("#txtPrecioVenta").val()) || null;
+        modelo["precio"] = modelo["precioventa"];
+        modelo["preciocompra"] = null;
         modelo["descuento"] = parseFloat((descuentoPct / 100).toFixed(6));
         modelo["esActivo"] = $("#cboEstado").val() === "1";
         modelo["idMedidaLocal"] = parseInt($("#cboMedidaLocal").val()) || null;
@@ -254,9 +254,7 @@ function mostrarModal(modelo = MODELO_BASE) {
     $("#txtDescripcion").val(modelo.descripcion);
     $("#cboCategoria").val(modelo.idCategoria == 0 ? $("#cboCategoria option:first").val() : modelo.idCategoria);
     $("#txtStock").val(modelo.stock);
-    $("#txtPrecio").val(modelo.precio);
-    $("#txtPrecioCompra").val(modelo.preciocompra);
-    $("#txtPrecioVenta").val(modelo.precioventa);
+    $("#txtPrecioVenta").val(modelo.precioventa || modelo.precio);
     $("#txtDescuentoPct").val(modelo.descuento ? (parseFloat(modelo.descuento) * 100).toFixed(2) : "0");
     $("#cboEstado").val(modelo.esActivo ? "1" : "0");
     $("#cboMedidaLocal").val(modelo.idMedidaLocal);
