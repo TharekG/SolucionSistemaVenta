@@ -16,17 +16,18 @@ namespace SistemaVenta.IOC
 {
     public static class Dependencia
     {
-        public static void InyectarDependencia(this IServiceCollection services, IConfiguration configuration) {
+        public static void InyectarDependencia(this IServiceCollection services, IConfiguration configuration)
+        {
             services.AddDbContext<DbventaContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("CadenaSQL"));
             });
 
-            services.AddTransient(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IVentaRepository, VentaRepository>();
 
             services.AddScoped<ICorreoService, CorreoService>();
-            services.AddScoped<IFireBaseService, FireBaseService>();
+            // services.AddScoped<IFireBaseService, FireBaseService>(); // reemplazado por almacenamiento local
 
             services.AddScoped<IUtilidadesService, UtilidadesService>();
             services.AddScoped<IRolService, RolService>();
@@ -40,7 +41,6 @@ namespace SistemaVenta.IOC
             services.AddScoped<IDashBoardService, DashBoardService>();
             services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<IClienteService, ClienteService>();
-
         }
     }
 }

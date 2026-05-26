@@ -241,10 +241,10 @@ function cargarMetodoPago() {
 
 function cargarTipoComprobante() {
     fetch("/Venta/ListaTipoComprobante").then(r => r.json()).then(data => {
-        const validos = ["I", "E"];
         const sel = $("#cboTipoComprobante");
         sel.empty().append('<option value="">-- Seleccione --</option>');
-        data.filter(x => validos.includes(x.cTipoDeComprobante.trim()))
-            .forEach(x => sel.append(`<option value="${x.idTipoDeComprobante}">${x.cTipoDeComprobante} - ${x.descripcion}</option>`));
+        data.forEach(x => sel.append(
+            `<option value="${x.idTipoDeComprobante}">${x.cTipoDeComprobante} - ${x.descripcion}</option>`
+        ));
     });
 }

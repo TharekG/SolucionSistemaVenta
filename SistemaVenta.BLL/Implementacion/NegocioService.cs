@@ -10,25 +10,37 @@ namespace SistemaVenta.BLL.Implementacion
     public class NegocioService : INegocioService
     {
         private readonly IGenericRepository<Negocio> _repositorio;
-        private readonly IFireBaseService _firebaseService;
+        private const string CARPETA_LOGO = "img/logo";
 
-        public NegocioService(IGenericRepository<Negocio> repositorio, IFireBaseService firebaseService)
+        public NegocioService(IGenericRepository<Negocio> repositorio)
         {
             _repositorio = repositorio;
-            _firebaseService = firebaseService;
+        }
+
+        private async Task<string> GuardarLogoLocal(Stream logo, string nombreLogo)
+        {
+            string carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", CARPETA_LOGO);
+            Directory.CreateDirectory(carpeta);
+            string rutaArchivo = Path.Combine(carpeta, nombreLogo);
+            using var stream = new FileStream(rutaArchivo, FileMode.Create);
+            await logo.CopyToAsync(stream);
+            return $"/{CARPETA_LOGO}/{nombreLogo}";
+        }
+
+        private void EliminarLogoLocal(string nombreLogo)
+        {
+            if (string.IsNullOrWhiteSpace(nombreLogo)) return;
+            string ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", CARPETA_LOGO, nombreLogo);
+            if (File.Exists(ruta)) File.Delete(ruta);
         }
 
         public async Task<Negocio> Obtener()
         {
             try
             {
-                Negocio negocio_encontrado = await _repositorio.Obtener(n => n.IdNegocio == 1);
-                return negocio_encontrado;
+                return await _repositorio.Obtener(n => n.IdNegocio == 1);
             }
-            catch
-            {
-                throw;
-            }
+            catch { throw; }
         }
 
         public async Task<Negocio> GuardarCambios(Negocio entidad, Stream Logo = null, string NombreLogo = "")
@@ -44,29 +56,22 @@ namespace SistemaVenta.BLL.Implementacion
                 negocio_encontrado.Telefono = entidad.Telefono;
                 negocio_encontrado.PorcentajeImpuesto = entidad.PorcentajeImpuesto;
                 negocio_encontrado.SimboloMoneda = entidad.SimboloMoneda;
-
-                // ── Campos nuevos ──────────────────────────────────────────
                 negocio_encontrado.Rfc = entidad.Rfc;
                 negocio_encontrado.Codigopostal = entidad.Codigopostal;
                 negocio_encontrado.IdRegimenFiscal = entidad.IdRegimenFiscal;
-                // ──────────────────────────────────────────────────────────
-
-                negocio_encontrado.NombreLogo = negocio_encontrado.NombreLogo == "" ? NombreLogo : negocio_encontrado.NombreLogo;
 
                 if (Logo != null)
                 {
-                    string urlLogo = await _firebaseService.SubirStorage(Logo, "carpeta_logo", negocio_encontrado.NombreLogo);
-                    negocio_encontrado.UrlLogo = urlLogo;
+                    // Eliminar logo anterior si existe
+                    EliminarLogoLocal(negocio_encontrado.NombreLogo);
+                    negocio_encontrado.NombreLogo = NombreLogo;
+                    negocio_encontrado.UrlLogo = await GuardarLogoLocal(Logo, NombreLogo);
                 }
 
                 await _repositorio.Editar(negocio_encontrado);
                 return negocio_encontrado;
             }
-            catch
-            {
-                throw;
-            }
+            catch { throw; }
         }
     }
 }
-

@@ -8,15 +8,28 @@ namespace SistemaVenta.BLL.Implementacion
     public class ProductoService : IProductoService
     {
         private readonly IGenericRepository<Producto> _repositorio;
-        // Ruta local donde se guardan las imágenes (relativa a wwwroot)
-        private readonly string _carpetaImagenes = Path.Combine("wwwroot", "imagenes", "producto");
+        private const string CARPETA_IMAGENES = "img/producto";
 
         public ProductoService(IGenericRepository<Producto> repositorio)
         {
             _repositorio = repositorio;
-            // Crear carpeta si no existe
-            if (!Directory.Exists(_carpetaImagenes))
-                Directory.CreateDirectory(_carpetaImagenes);
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", CARPETA_IMAGENES));
+        }
+
+        private async Task<string> GuardarImagenLocal(Stream imagen, string nombreImagen)
+        {
+            string carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", CARPETA_IMAGENES);
+            string rutaArchivo = Path.Combine(carpeta, nombreImagen);
+            using var fs = new FileStream(rutaArchivo, FileMode.Create);
+            await imagen.CopyToAsync(fs);
+            return $"/{CARPETA_IMAGENES}/{nombreImagen}";
+        }
+
+        private void EliminarImagenLocal(string nombreImagen)
+        {
+            if (string.IsNullOrWhiteSpace(nombreImagen)) return;
+            string ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", CARPETA_IMAGENES, nombreImagen);
+            if (File.Exists(ruta)) File.Delete(ruta);
         }
 
         public async Task<List<Producto>> Lista()
@@ -46,13 +59,7 @@ namespace SistemaVenta.BLL.Implementacion
                 entidad.NombreImagen = NombreImagen;
 
                 if (imagen != null)
-                {
-                    string rutaArchivo = Path.Combine(_carpetaImagenes, NombreImagen);
-                    using (var fs = new FileStream(rutaArchivo, FileMode.Create))
-                        await imagen.CopyToAsync(fs);
-
-                    entidad.UrlImagen = $"/imagenes/producto/{NombreImagen}";
-                }
+                    entidad.UrlImagen = await GuardarImagenLocal(imagen, NombreImagen);
 
                 Producto producto_creado = await _repositorio.Crear(entidad);
 
@@ -60,8 +67,7 @@ namespace SistemaVenta.BLL.Implementacion
                     throw new TaskCanceledException("No se pudo crear el producto.");
 
                 IQueryable<Producto> query = await _repositorio.Consultar(p => p.IdProducto == producto_creado.IdProducto);
-
-                producto_creado = query
+                return query
                     .Include(p => p.IdCategoriaNavigation)
                     .Include(p => p.IdMarcaNavigation)
                     .Include(p => p.IdMedidaLocalNavigation)
@@ -71,8 +77,6 @@ namespace SistemaVenta.BLL.Implementacion
                     .Include(p => p.IdImpuestoNavigation)
                     .Include(p => p.IdTipoFactorNavigation)
                     .First();
-
-                return producto_creado;
             }
             catch { throw; }
         }
@@ -81,7 +85,6 @@ namespace SistemaVenta.BLL.Implementacion
         {
             Producto? producto_existe = await _repositorio.Obtener(
                 p => p.CodigoBarra == entidad.CodigoBarra && p.IdProducto != entidad.IdProducto);
-
             if (producto_existe != null)
                 throw new TaskCanceledException("El código de barra ya existe.");
 
@@ -90,17 +93,14 @@ namespace SistemaVenta.BLL.Implementacion
                 IQueryable<Producto> queryProducto = await _repositorio.Consultar(p => p.IdProducto == entidad.IdProducto);
                 Producto producto_para_editar = queryProducto.First();
 
-                // ── Campos originales ──────────────────────────────────────
                 producto_para_editar.CodigoBarra = entidad.CodigoBarra;
                 producto_para_editar.Descripcion = entidad.Descripcion;
                 producto_para_editar.IdCategoria = entidad.IdCategoria;
                 producto_para_editar.Stock = entidad.Stock;
                 producto_para_editar.Precio = entidad.Precioventa;
                 producto_para_editar.EsActivo = entidad.EsActivo;
-
-                // ── Campos nuevos ──────────────────────────────────────────
                 producto_para_editar.IdMarca = entidad.IdMarca;
-                producto_para_editar.Marca = entidad.Marca;           // campo texto legacy
+                producto_para_editar.Marca = entidad.Marca;
                 producto_para_editar.Modelo = entidad.Modelo;
                 producto_para_editar.Preciocompra = entidad.Preciocompra;
                 producto_para_editar.Precioventa = entidad.Precioventa;
@@ -113,29 +113,18 @@ namespace SistemaVenta.BLL.Implementacion
                 producto_para_editar.IdTipoFactor = entidad.IdTipoFactor;
                 producto_para_editar.Impuestoproducto = entidad.Impuestoproducto;
 
-                // ── Imagen ─────────────────────────────────────────────────
                 if (imagen != null)
                 {
-                    // Eliminar imagen anterior si existe
-                    if (!string.IsNullOrEmpty(producto_para_editar.NombreImagen))
-                    {
-                        string rutaAnterior = Path.Combine(_carpetaImagenes, producto_para_editar.NombreImagen);
-                        if (File.Exists(rutaAnterior)) File.Delete(rutaAnterior);
-                    }
-
-                    string rutaNueva = Path.Combine(_carpetaImagenes, NombreImagen);
-                    using (var fs = new FileStream(rutaNueva, FileMode.Create))
-                        await imagen.CopyToAsync(fs);
-
+                    EliminarImagenLocal(producto_para_editar.NombreImagen);
                     producto_para_editar.NombreImagen = NombreImagen;
-                    producto_para_editar.UrlImagen = $"/imagenes/producto/{NombreImagen}";
+                    producto_para_editar.UrlImagen = await GuardarImagenLocal(imagen, NombreImagen);
                 }
 
                 bool respuesta = await _repositorio.Editar(producto_para_editar);
                 if (!respuesta)
                     throw new TaskCanceledException("No se pudo editar el producto.");
 
-                Producto producto_editado = queryProducto
+                return queryProducto
                     .Include(p => p.IdCategoriaNavigation)
                     .Include(p => p.IdMarcaNavigation)
                     .Include(p => p.IdMedidaLocalNavigation)
@@ -145,8 +134,6 @@ namespace SistemaVenta.BLL.Implementacion
                     .Include(p => p.IdImpuestoNavigation)
                     .Include(p => p.IdTipoFactorNavigation)
                     .First();
-
-                return producto_editado;
             }
             catch { throw; }
         }
@@ -160,14 +147,10 @@ namespace SistemaVenta.BLL.Implementacion
                     throw new TaskCanceledException("El producto no existe");
 
                 string nombreImagen = producto_encontrado.NombreImagen ?? "";
-
                 bool respuesta = await _repositorio.Eliminar(producto_encontrado);
 
-                if (respuesta && !string.IsNullOrEmpty(nombreImagen))
-                {
-                    string ruta = Path.Combine(_carpetaImagenes, nombreImagen);
-                    if (File.Exists(ruta)) File.Delete(ruta);
-                }
+                if (respuesta)
+                    EliminarImagenLocal(nombreImagen);
 
                 return true;
             }

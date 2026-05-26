@@ -69,8 +69,7 @@ namespace SistemaVenta.AplicacionWeb.Utilidades
                 ? "99"
                 : (venta.IdFormaPagoNavigation?.CFormaPago ?? "01").Trim().PadLeft(2, '0');
             string lugarExp = negocio.Codigopostal ?? venta.CodigoPostal ?? "64000";
-            string tipoComp = (venta.IdTipoDeComprobanteNavigation?.CTipoDeComprobante ?? "").Trim();
-            if (string.IsNullOrEmpty(tipoComp) || tipoComp.Length > 1) tipoComp = "I";
+            string tipoComp = "I"; // Siempre Ingreso para ventas
 
             string rfcEmisor = negocio.Rfc ?? "";
             string nombreEmisor = negocio.Nombre ?? "";
