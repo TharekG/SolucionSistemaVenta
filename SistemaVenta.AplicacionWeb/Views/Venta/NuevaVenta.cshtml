@@ -19,34 +19,22 @@
     <div class="col-sm-8">
 
         <!-- ── Cliente ─────────────────────────────────────────────── -->
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 bg-second-primary">
-                        <h6 class="m-0 font-weight-bold text-white">Cliente</h6>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-second-primary">
+                <h6 class="m-0 font-weight-bold text-white">Cliente</h6>
+            </div>
+            <div class="card-body">
+                <input type="hidden" id="txtIdCliente" value="0">
+                <div class="form-row align-items-end">
+                    <div class="form-group col-sm-5">
+                        <label>RFC / Cliente</label>
+                        <select class="form-control form-control-sm" id="cboCliente" style="width:100%">
+                        </select>
                     </div>
-                    <div class="card-body">
-                        <input type="hidden" id="txtIdCliente" value="0">
-                        <div class="form-row align-items-end">
-                            <div class="form-group col-sm-4">
-                                <label>RFC</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control form-control-sm" id="txtRfcCliente"
-                                           placeholder="XAXX010101000" maxlength="13"
-                                           style="text-transform:uppercase">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="btnBuscarCliente">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group col-sm-8">
-                                <label>Nombre Cliente</label>
-                                <input type="text" class="form-control form-control-sm" id="txtNombreCliente"
-                                       placeholder="Nombre completo" readonly>
-                            </div>
-                        </div>
+                    <div class="form-group col-sm-7">
+                        <label>Nombre Cliente</label>
+                        <input type="text" class="form-control form-control-sm"
+                               id="txtNombreCliente" readonly>
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@
 let ProductosParaVenta = [];
 
 $(document).ready(function () {
+    cargarClientes(); 
 
     // Cargar tipos de documento
     fetch("/Venta/ListaTipoDocumentoVenta")
@@ -61,32 +62,40 @@ $(document).ready(function () {
     });
 
     // ── Buscar Cliente por RFC ──────────────────────────────────────
-    $("#btnBuscarCliente").click(function () {
-        const rfc = $("#txtRfcCliente").val().trim().toUpperCase();
-        if (!rfc) {
-            toastr.warning("", "Ingrese un RFC para buscar");
-            return;
-        }
-        fetch(`/Clientes/ObtenerPorRfc?rfc=${rfc}`)
+    function cargarClientes() {
+        fetch("/Clientes/Lista")
             .then(r => r.ok ? r.json() : Promise.reject(r))
             .then(responseJson => {
-                if (responseJson.estado && responseJson.objeto) {
-                    const cliente = responseJson.objeto;
-                    $("#txtIdCliente").val(cliente.idCliente);
-                    $("#txtNombreCliente").val(cliente.nombreCliente);
-                    toastr.success("", `Cliente encontrado: ${cliente.nombreCliente}`);
-                } else {
-                    // No encontrado → Público en General
-                    $("#txtIdCliente").val(0);
-                    $("#txtNombreCliente").val("Público en General");
-                    toastr.info("", "RFC no encontrado. Se usará Público en General.");
-                }
-            })
-            .catch(() => {
-                $("#txtIdCliente").val(0);
+                const sel = $("#cboCliente");
+                // Opción por defecto ya está en el HTML
+                responseJson.data
+                    .filter(c => c.esActivo == 1)
+                    .forEach(c => {
+                        sel.append(new Option(
+                            c.rfcCliente,
+                            c.idCliente,
+                            false, false
+                        ));
+                        // Guardar datos en el option para recuperarlos
+                        sel.find(`option[value="${c.idCliente}"]`)
+                            .attr("data-nombre", c.nombreCliente)
+                            .attr("data-rfc", c.rfcCliente);
+                    });
+
+                // Inicializar Select2
+                sel.select2({ placeholder: "Seleccionar cliente..." });
+
+                // Al cambiar selección
+                sel.on("select2:select", function (e) {
+                    const opt = $(this).find("option:selected");
+                    $("#txtIdCliente").val(opt.val());
+                    $("#txtNombreCliente").val(opt.data("nombre"));
+                });
+
+                // Valor inicial
                 $("#txtNombreCliente").val("Público en General");
             });
-    });
+    }
 
     // RFC en mayúsculas automático
     $("#txtRfcCliente").on("input", function () {
