@@ -115,7 +115,7 @@ $(document).ready(function () {
         const venta = {
             idTipoDocumentoVenta: $("#cboTipoDocumentoVenta").val(),
             idCliente: idCliente,
-            documentoCliente: $("#txtRfcCliente").val().substring(0, 13),
+            documentoCliente: $("#cboCliente").find("option:selected").data("rfc") || "XAXX010101000",
             nombreCliente: $("#txtNombreCliente").val() || "Público en General",
             subTotal: $("#txtSubTotal").val(),
             impuestoTotal: $("#txtIGV").val(),
