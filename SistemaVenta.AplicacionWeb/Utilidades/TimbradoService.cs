@@ -80,11 +80,23 @@ namespace SistemaVenta.AplicacionWeb.Utilidades
             if (venta.IdClienteNavigation is { } cli)
             {
                 string rfcBd = (cli.RfcCliente ?? "").Trim().ToUpper();
-                rfcRec = RfcEsValido(rfcBd) ? rfcBd : "XAXX010101000";
-                nombreRec = cli.NombreCliente ?? "Público en General";
-                cpRec = cli.IdCodigoPostal?.ToString() ?? lugarExp;
-                regimenRec = cli.IdRegimenFiscalNavigation?.CRegimenFiscal
-                             ?? await GetRegimenCode(cli.IdRegimenFiscal) ?? "616";
+                rfcRec = (rfcBd == "XAXX010101000" || rfcBd == "XEXX010101000")
+                    ? rfcBd
+                    : "XAXX010101000";
+
+                if (rfcRec == "XAXX010101000" || rfcRec == "XEXX010101000")
+                {
+                    cpRec = lugarExp;
+                    regimenRec = "616";
+                    nombreRec = "Público en General";
+                }
+                else
+                {
+                    nombreRec = cli.NombreCliente ?? "Público en General";
+                    cpRec = cli.IdCodigoPostal?.ToString() ?? lugarExp;
+                    regimenRec = cli.IdRegimenFiscalNavigation?.CRegimenFiscal
+                                 ?? await GetRegimenCode(cli.IdRegimenFiscal) ?? "616";
+                }
             }
             else
             {
